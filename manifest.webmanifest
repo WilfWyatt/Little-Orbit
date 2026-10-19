@@ -1,0 +1,19 @@
+{
+  "name": "Little Orbit \u2014 Your Alien Pet",
+  "short_name": "Little Orbit",
+  "description": "Raise a tiny alien and discover who they become.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#11192d",
+  "theme_color": "#17243c",
+  "icons": [
+    {
+      "src": "assets/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

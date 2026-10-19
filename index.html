@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#17243c">
+  <meta name="description" content="Raise a tiny alien, discover its personality, and help it evolve.">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <title>Little Orbit — Your Alien Pet</title>
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <div class="brand-mark" aria-hidden="true">✦</div>
+      <div><p class="eyebrow">A TINY LIFE, A WHOLE UNIVERSE</p><h1>Little Orbit</h1></div>
+      <button id="sound-toggle" class="icon-button" aria-label="Toggle sound" title="Toggle sound">♫</button>
+    </header>
+
+    <section class="pet-card" aria-label="Your alien">
+      <div class="sky-decoration star star-a">✦</div><div class="sky-decoration star star-b">·</div>
+      <div class="sky-decoration planet">◕</div>
+      <div class="pet-stage">
+        <div id="pet-aura" class="pet-aura"></div>
+        <img id="pet-art" class="pet-art" src="assets/hatchling.svg" alt="Your little alien">
+        <div id="pet-mood" class="mood-bubble">Hello, star friend!</div>
+      </div>
+      <div class="pet-caption">
+        <span id="stage-label" class="stage-pill">BABY · DAY 1</span>
+        <h2 id="pet-name">Pip</h2>
+        <p id="pet-description">A curious little life from somewhere far away.</p>
+      </div>
+      <div class="pet-xp"><span>Growing up</span><div class="xp-track"><div id="growth-fill" class="xp-fill"></div></div><span id="growth-label">0%</span></div>
+    </section>
+
+    <section class="needs-section">
+      <div class="section-heading"><div><p class="eyebrow">LITTLE CHECK-IN</p><h2>How are they feeling?</h2></div><span id="status-chip" class="status-chip">Doing okay</span></div>
+      <div id="needs-grid" class="needs-grid"></div>
+    </section>
+
+    <section class="care-section">
+      <div class="section-heading"><div><p class="eyebrow">YOUR LITTLE ROUTINE</p><h2>Spend time together</h2></div></div>
+      <div class="action-grid">
+        <button class="action-button" data-action="feed"><span class="action-icon food">✿</span><strong>Feed</strong><small>Cosmic fruit</small></button>
+        <button class="action-button" data-action="play"><span class="action-icon play">✧</span><strong>Play</strong><small>Have a wiggle</small></button>
+        <button class="action-button" data-action="clean"><span class="action-icon clean">☼</span><strong>Clean</strong><small>Tidy habitat</small></button>
+        <button class="action-button" data-action="rest"><span class="action-icon rest">☾</span><strong>Rest</strong><small>Gentle snooze</small></button>
+        <button class="action-button" data-action="cuddle"><span class="action-icon cuddle">♡</span><strong>Bond</strong><small>Say hello</small></button>
+        <button class="action-button" data-action="explore"><span class="action-icon explore">⌕</span><strong>Explore</strong><small>Find a surprise</small></button>
+      </div>
+    </section>
+
+    <section class="personality-card">
+      <div class="section-heading"><div><p class="eyebrow">WHO ARE YOU BECOMING?</p><h2>Little personality</h2></div><span class="sparkle">✦</span></div>
+      <p class="muted">Your choices gently shape who your alien becomes. There are no bad personalities.</p>
+      <div id="traits-list" class="traits-list"></div>
+      <div class="evolution-note"><span>🪐</span><p><strong>Evolution is a surprise.</strong><br>Keep caring for your friend to discover their adult form.</p></div>
+    </section>
+
+    <section class="journal-card">
+      <div class="section-heading"><div><p class="eyebrow">MEMORIES FROM YOUR ORBIT</p><h2>Little journal</h2></div><span class="journal-count" id="journal-count">0 notes</span></div>
+      <ul id="journal-list" class="journal-list"></ul>
+    </section>
+
+    <footer><span>Made of stardust and small moments.</span><button id="rename-button" class="text-button">Rename pet</button><button id="export-button" class="text-button">Export save</button></footer>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <dialog id="welcome-dialog" class="modal">
+    <div class="modal-orbit">✦</div><p class="eyebrow">SIGNAL RECEIVED</p><h2>A tiny life is waiting.</h2>
+    <p>Your bio-pod has found an alien hatchling. Give your new friend a name, then help them discover the universe.</p>
+    <form id="welcome-form"><label for="new-name">What shall we call them?</label><input id="new-name" maxlength="18" placeholder="Pip" autocomplete="off"><button class="primary-button" type="submit">Meet my alien <span>→</span></button></form>
+  </dialog>
+  <input id="import-save" type="file" accept="application/json,.json" hidden>
+  <script src="js/pet.js"></script><script src="js/time.js"></script><script src="js/evolution.js"></script><script src="js/save.js"></script><script src="js/app.js"></script>
+</body>
+</html>
