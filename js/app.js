@@ -27,7 +27,13 @@
     {id:"orbit-orchid",name:"Orbit Orchid Seed",kind:"seed",icon:"✺",rarity:"Rare",desc:"A rare seed that grows in spirals, not stems.",plant:"Orbit Orchid",decor:"✺"},
     {id:"echo-stone",name:"Echo Stone",kind:"decor",icon:"◈",rarity:"Very rare",desc:"It repeats the last note of a sound you make.",decor:"◈"}
   ];
-  const plantArt = {"Moonflower":"✿","Chorus Bloom":"❋","Star-moss":"❈","Orbit Orchid":"✺"};
+  const plantArt = {"Moonflower":"plant-moonflower.svg","Chorus Bloom":"plant-chorus.svg","Star-moss":"plant-starmoss.svg","Orbit Orchid":"plant-orchid.svg"};
+  const gardenSeedlings = [
+    {x:7,b:43,w:22,h:30,t:0},{x:23,b:39,w:16,h:23,t:1},{x:34,b:44,w:19,h:27,t:2},
+    {x:63,b:42,w:18,h:25,t:1},{x:76,b:39,w:23,h:31,t:0},{x:90,b:43,w:15,h:21,t:2},
+    {x:14,b:50,w:13,h:18,t:2},{x:48,b:46,w:17,h:24,t:0},{x:84,b:49,w:13,h:18,t:1}
+  ];
+  const gardenStones = [{x:13,b:17,w:25},{x:31,b:15,w:18},{x:58,b:17,w:28},{x:80,b:16,w:20},{x:92,b:18,w:14}];
   function ensureWorldData(){
     if(!pet.collection) pet.collection={};
     if(!Array.isArray(pet.planted)) pet.planted=[];
@@ -59,9 +65,14 @@
   }
   function renderHabitat(){
     ensureWorldData();
-    const plants=$("habitat-plants"),decor=$("habitat-decor");
-    plants.innerHTML=pet.planted.map((name,i)=>{const progress=Math.min(100,Math.floor((Date.now()-(pet.plantGrowth[name]||Date.now()))/3600000*20));return `<span class="habitat-plant plant-${i%4}" title="${escapeHtml(name)} · ${progress}% grown"><i>${plantArt[name]||'✿'}</i><small>${progress>=100?'Blooming':progress>=50?'Growing':'Sprout'}</small></span>`}).join("");
-    decor.innerHTML=pet.decorations.map((symbol,i)=>`<span class="habitat-decoration decor-${i%4}">${symbol}</span>`).join("");
+    const plants=$("habitat-plants"),decor=$("habitat-decor"),base=$("habitat-baseflora"),wildlife=$("habitat-wildlife");
+    // Deterministic procedural garden: the base flora and stones are scattered from fixed layout seeds,
+    // while planted species and keepsakes are added in their own layer. Layout stays stable between renders.
+    base.innerHTML = gardenSeedlings.map((f,i)=>`<span class="wild-flora flora-${f.t}" style="left:${f.x}%;bottom:${f.b}px;width:${f.w}px;height:${f.h}px;--sway:${(i%4)+3}s;animation-delay:-${i%5}s"><i></i><i></i><i></i></span>`).join("") + gardenStones.map((r,i)=>`<img class="garden-stone stone-${i%3}" src="assets/alien-stone.svg" alt="" style="left:${r.x}%;bottom:${r.b}px;width:${r.w}px">`).join("");
+    plants.innerHTML=pet.planted.map((name,i)=>{const progress=Math.min(100,Math.floor((Date.now()-(pet.plantGrowth[name]||Date.now()))/3600000*20));const asset=plantArt[name]||"plant-moonflower.svg";const x=[18,39,61,78][i%4];const bottom=48+(i%2)*7;return `<span class="habitat-plant plant-${i%4}" style="left:${x}%;bottom:${bottom}px" title="${escapeHtml(name)} · ${progress}% grown"><img src="assets/${asset}" alt="${escapeHtml(name)}" style="width:${progress>=100?48:40}px;height:${progress>=100?58:49}px"><small>${progress>=100?'Blooming':progress>=50?'Growing':'Sprout'}</small></span>`}).join("");
+    decor.innerHTML=pet.decorations.map((symbol,i)=>{const x=[27,53,70,42,86][i%5];return `<span class="habitat-decoration decor-${i%4}" style="left:${x}%;bottom:${52+(i%3)*7}px">${symbol}</span>`}).join("");
+    const hasButterfly=!!(pet.collection&&pet.collection.glowmoth);
+    wildlife.innerHTML=hasButterfly?'<img class="garden-butterfly" src="assets/glow-butterfly.svg" alt="Your glow-moth fluttering around the garden" title="Glow-moth">':'';
     $("planted-count").textContent=pet.planted.length;$("decor-count").textContent=pet.decorations.length;$("habitat-days").textContent=`Day ${Math.max(1,Math.floor(pet.ageHours/24)+1)}`;
     $("habitat-status").textContent=pet.planted.length?"Something is growing":"A world to make your own";
     const owned=discoveryCatalogue.filter(d=>(pet.collection[d.id]||0)>0 && (d.kind==='seed'||d.kind==='decor'));
