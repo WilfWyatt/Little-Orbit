@@ -17,3 +17,19 @@ button,input{font:inherit}button{cursor:pointer;-webkit-tap-highlight-color:tran
 @keyframes reactSnooze{0%{transform:scale(1)}45%{transform:scale(.92) translateY(5px)}100%{transform:scale(1)}}
 @keyframes reactionPop{0%{opacity:0;transform:translate(-50%,10px) scale(.6)}20%{opacity:1;transform:translate(-50%,-8px) scale(1.15)}75%{opacity:1;transform:translate(-50%,-35px) scale(1)}100%{opacity:0;transform:translate(-50%,-55px) scale(.8)}}
 @media(prefers-reduced-motion:reduce){.pet-art.react-bounce,.pet-art.react-wiggle,.pet-art.react-snooze,.pet-reaction.pop{animation:none}.pet-reaction.pop{opacity:1;transform:translate(-50%,-12px)}}
+
+/* Persistent mobile care dock: act from anywhere, then bring the pet back into view. */
+.care-dock{display:none}
+@media(max-width:699px){
+  .app-shell{padding-bottom:calc(104px + env(safe-area-inset-bottom))}
+  .care-dock{position:fixed;z-index:9;left:8px;right:8px;bottom:calc(7px + env(safe-area-inset-bottom));display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:3px;padding:8px 5px 6px;border:1px solid #ffffff20;border-radius:20px;background:#17243cf2;box-shadow:0 10px 35px #0007;backdrop-filter:blur(16px);}
+  .dock-action{min-width:0;min-height:57px;padding:4px 0 2px;border:0;border-radius:12px;background:transparent;color:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:9px;font-weight:800;}
+  .dock-action:active{background:#ffffff12;transform:scale(.96)}
+  .dock-icon{width:29px;height:29px;border-radius:10px;display:grid;place-items:center;font-size:19px;line-height:1}
+  .dock-action>span:last-child{white-space:nowrap;letter-spacing:-.25px}
+  .toast{bottom:calc(91px + env(safe-area-inset-bottom))}
+  .pet-card{scroll-margin-top:10px}
+  /* The dock replaces the large in-page grid on small screens. */
+  .care-section .action-grid{display:none}
+}
+@media(min-width:700px){.care-dock{display:none!important}}
