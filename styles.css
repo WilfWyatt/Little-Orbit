@@ -33,3 +33,48 @@ button,input{font:inherit}button{cursor:pointer;-webkit-tap-highlight-color:tran
   .care-section .action-grid{display:none}
 }
 @media(min-width:700px){.care-dock{display:none!important}}
+
+
+/* Version 0.4: title screen and more expressive pet reactions. */
+[hidden]{display:none!important}
+.title-screen{position:fixed;inset:0;z-index:20;overflow:hidden;background:#10182d}
+.title-art{width:100%;height:100%;object-fit:cover;object-position:center;display:block}
+.title-play{position:absolute;left:18%;width:64%;height:10%;bottom:7.2%;border:0;border-radius:999px;background:transparent;box-shadow:none}
+.title-play:focus-visible{outline:3px solid #a4ffe5;outline-offset:4px}
+.title-sound-toggle{position:absolute;top:2.2%;right:5%;width:15%;aspect-ratio:1;border:0;border-radius:50%;background:transparent;color:transparent;font-size:0}
+.title-sound-toggle:focus-visible{outline:3px solid #a4ffe5}
+.title-sound-toggle.sound-off{background:#111a3020}
+.pet-mouth{position:absolute;z-index:4;left:50%;top:57.7%;width:0;height:0;transform:translate(-50%,-50%);pointer-events:none}
+.pet-mouth.open{width:17px;height:21px;border-radius:50% 50% 55% 55%;background:#29314f;border:2px solid #397d9a;box-shadow:inset 0 -5px 0 #ff9eb7;animation:nomNoms .28s ease-in-out 4 alternate}
+.pet-closed-eyes{display:none;position:absolute;z-index:4;left:50%;top:48.7%;width:56px;transform:translateX(-50%);justify-content:space-between;pointer-events:none}
+.pet-closed-eyes.closed{display:flex}
+.pet-closed-eyes i{width:20px;height:12px;border-bottom:3px solid #29395e;border-radius:0 0 50% 50%;background:linear-gradient(#8be9d8,#8be9d8);}
+.pet-dirt{position:absolute;z-index:4;inset:0;pointer-events:none}
+.pet-dirt i{position:absolute;width:7px;height:5px;border-radius:50%;background:#8a6a63;box-shadow:0 0 2px #5a4c5b;transform:rotate(-20deg)}
+.pet-effects{position:absolute;z-index:5;inset:0;pointer-events:none;overflow:visible}
+.effect-particle{position:absolute;left:calc(50% + var(--drift));top:58%;font-size:22px;line-height:1;color:#b8ffe9;text-shadow:0 0 12px #a2ffe8;opacity:0;animation:particleRise 1.4s ease-out var(--delay) both}
+.effects-clean .effect-particle{font-size:16px;color:#e3fbff;text-shadow:0 0 9px #fff,0 0 18px #9af8e3;animation:bubbleWash 1.6s ease-out var(--delay) both}
+.effects-clean .particle-0,.effects-clean .particle-3{left:calc(50% - 45px)}
+.effects-clean .particle-1,.effects-clean .particle-4{left:calc(50% + 35px)}
+.effects-clean .particle-2,.effects-clean .particle-5{left:calc(50% + var(--drift));}
+.effects-cuddle .effect-particle{top:45%;font-size:24px;color:#ffb5d3;animation:heartFloat 2.1s ease-out var(--delay) both}
+.effects-cuddle .particle-0,.effects-cuddle .particle-3{left:calc(50% - 22px)}
+.effects-cuddle .particle-1,.effects-cuddle .particle-4{left:calc(50% + 12px)}
+.effects-rest .effect-particle{left:calc(50% + var(--drift));top:38%;font-size:20px;color:#d7ceff;animation:snoozeFloat 2.3s ease-out var(--delay) both}
+.effects-play .effect-particle{top:42%;animation:runSpark .75s ease-out var(--delay) both}
+.effects-explore .effect-particle{top:40%;color:#c8c0ff;animation:particleRise 1.6s ease-out var(--delay) both}
+.pet-art.react-run{animation:runAbout .24s ease-in-out 6 alternate}
+.pet-reaction.reaction-feed{top:61%;font-size:12px;font-weight:900;color:#ffe0c8;background:#4b3a5a;border-radius:12px;padding:4px 8px}
+.pet-reaction.reaction-rest{top:31%;left:61%;font-size:21px;color:#ded6ff}
+.pet-reaction.reaction-cuddle{top:30%;font-size:22px;color:#ffb5d3}
+.pet-reaction.reaction-clean{top:27%;font-size:30px;color:#e4fff8;text-shadow:0 0 16px #a7ffe8}
+@keyframes nomNoms{from{transform:translate(-50%,-50%) scaleY(.65)}to{transform:translate(-50%,-50%) scaleY(1.15)}}
+@keyframes runAbout{from{transform:translate(-4px,-2px) rotate(-5deg) scale(1.02)}to{transform:translate(4px,2px) rotate(5deg) scale(.98)}}
+@keyframes particleRise{0%{opacity:0;transform:translateY(12px) scale(.5) rotate(-15deg)}20%{opacity:1}100%{opacity:0;transform:translateY(-82px) scale(1.15) rotate(25deg)}}
+@keyframes bubbleWash{0%{opacity:0;transform:translateY(22px) scale(.5)}18%{opacity:.9}70%{opacity:.85}100%{opacity:0;transform:translateY(-85px) scale(1.25)}}
+@keyframes heartFloat{0%{opacity:0;transform:translateY(15px) scale(.45)}18%{opacity:1}100%{opacity:0;transform:translateY(-115px) translateX(var(--drift)) scale(1.15) rotate(12deg)}}
+@keyframes snoozeFloat{0%{opacity:0;transform:translateY(5px) scale(.7)}20%{opacity:1}100%{opacity:0;transform:translateY(-68px) translateX(18px) scale(1.15)}}
+@keyframes runSpark{0%{opacity:0;transform:translate(-8px,12px) scale(.6)}25%{opacity:1}100%{opacity:0;transform:translate(18px,-55px) scale(1.1)}}
+@media(prefers-reduced-motion:reduce){.effect-particle,.pet-art.react-run,.pet-mouth.open{animation:none!important}.effect-particle{opacity:.7}}
+.title-sound-toggle.sound-off:after{content:"╱";position:absolute;inset:0;display:grid;place-items:center;color:#f0f5ff;font-size:48px;font-weight:300;text-shadow:0 1px 5px #18243b;pointer-events:none}
+.effects-clean .effect-particle:nth-child(3n){animation-delay:calc(var(--delay) + .85s);font-size:23px;color:#fff4c7;text-shadow:0 0 12px #fff,0 0 22px #8ef0d1}

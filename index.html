@@ -11,12 +11,12 @@
   <title>Little Orbit — Your Alien Pet</title>
 </head>
 <body>
-  <main class="app-shell">
-    <header class="topbar">
-      <div class="brand-mark" aria-hidden="true">✦</div>
-      <div><p class="eyebrow">A TINY LIFE, A WHOLE UNIVERSE</p><h1>Little Orbit</h1></div>
-      <button id="sound-toggle" class="icon-button" aria-label="Toggle sound" title="Toggle sound">♫</button>
-    </header>
+  <section id="title-screen" class="title-screen" aria-label="Little Orbit title screen">
+    <img class="title-art" src="assets/title-screen.png" alt="A ringed alien gas giant and tiny moon in a colourful nebula, Little Orbit" />
+    <button id="title-sound-toggle" class="title-sound-toggle" aria-label="Toggle sound">♫</button>
+    <button id="title-play" class="title-play" aria-label="Play Little Orbit"></button>
+  </section>
+  <main class="app-shell" id="game-screen" hidden>
 
     <section class="pet-card" aria-label="Your alien">
       <div class="sky-decoration star star-a">✦</div><div class="sky-decoration star star-b">·</div>
@@ -24,6 +24,10 @@
       <div class="pet-stage">
         <div id="pet-aura" class="pet-aura"></div>
         <img id="pet-art" class="pet-art" src="assets/hatchling.svg" alt="Your little alien">
+        <div id="pet-mouth" class="pet-mouth" aria-hidden="true"></div>
+        <div id="pet-closed-eyes" class="pet-closed-eyes" aria-hidden="true"><i></i><i></i></div>
+        <div id="pet-dirt" class="pet-dirt" aria-hidden="true"></div>
+        <div id="pet-effects" class="pet-effects" aria-hidden="true"></div>
         <div id="pet-mood" class="mood-bubble">Hello, star friend!</div>
         <div id="pet-reaction" class="pet-reaction" aria-hidden="true"></div>
       </div>

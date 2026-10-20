@@ -29,3 +29,13 @@ Open `index.html` in a browser. For full PWA/offline support, serve the folder o
 
 ## Updating an existing GitHub Pages install
 Upload and overwrite the updated files while keeping the `assets` and `js` folders at the repository root. The service-worker cache has been bumped to v3 so the browser can pick up the new build. If the old version remains visible, close the installed app completely and reopen it; if needed, refresh the site once while online.
+
+
+## Version 0.4 update
+- Added a nebula title screen with the ringed gas giant artwork and Play/sound controls.
+- Removed the in-game branding header.
+- Expanded care reactions: eating mouth, dirt accumulation, faster play bob, cleaning bubbles and sparkle burst, sleepy eyes and more Zs, and floating hearts.
+- Explore now costs more hunger, energy and cleanliness, and can grant at most three small random trait boosts per calendar day.
+- Cleaning removes visible dirt.
+
+Upload the full contents of this ZIP to the repository root. Keep `assets/` and `js/` folders intact.
