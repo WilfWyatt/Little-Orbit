@@ -111,3 +111,19 @@ button,input{font:inherit}button{cursor:pointer;-webkit-tap-highlight-color:tran
 @keyframes plantSway{0%,100%{transform:rotate(-2deg) translateY(0)}50%{transform:rotate(3deg) translateY(-3px)}}
 @media(min-width:500px){.collection-grid{grid-template-columns:1fr 1fr}.habitat-scene{height:300px}}
 @media(prefers-reduced-motion:reduce){.habitat-plant{animation:none!important}}
+
+/* v0.5.1: illustrated procedural habitat and living garden visitor */
+.habitat-baseflora{position:absolute;inset:0;z-index:1;pointer-events:none}
+.wild-flora{position:absolute;display:block;transform-origin:bottom center;animation:wildSway var(--sway,4s) ease-in-out infinite;filter:drop-shadow(0 0 5px #8ef0d122)}
+.wild-flora i{position:absolute;bottom:0;left:45%;width:42%;height:80%;border-radius:100% 0 100% 0;background:linear-gradient(150deg,#8de3c1,#327b79);transform-origin:bottom left;transform:rotate(-32deg)}
+.wild-flora i:nth-child(2){left:23%;height:62%;background:linear-gradient(150deg,#b4a8ef,#536b9b);transform:rotate(35deg) scale(.86)}
+.wild-flora i:nth-child(3){left:49%;height:53%;background:linear-gradient(150deg,#a6e8e0,#397b82);transform:rotate(-4deg) scale(.72)}
+.flora-1 i{background:linear-gradient(150deg,#c6b8ff,#7867b5)}.flora-2 i{background:linear-gradient(150deg,#f1d79c,#8eaa9b)}
+.garden-stone{position:absolute;height:auto;z-index:1;opacity:.88;filter:drop-shadow(0 3px 4px #08132288)}.stone-1{filter:hue-rotate(20deg) drop-shadow(0 3px 4px #08132288)}.stone-2{filter:hue-rotate(285deg) drop-shadow(0 3px 4px #08132288)}
+.habitat-plant{z-index:3}.habitat-plant img{object-fit:contain;filter:drop-shadow(0 0 8px #8ef0d155);animation:plantSway 4s ease-in-out infinite}.habitat-plant small{margin-top:-2px}
+.habitat-wildlife{position:absolute;inset:0;z-index:4;pointer-events:none;overflow:hidden}
+.garden-butterfly{position:absolute;left:10%;top:33%;width:43px;height:35px;object-fit:contain;filter:drop-shadow(0 0 9px #a8f3dc99);animation:butterflyWander 13s ease-in-out infinite,butterflyFlutter .28s ease-in-out infinite alternate;transform-origin:center}
+@keyframes wildSway{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(4deg)}}
+@keyframes butterflyWander{0%{left:8%;top:42%;transform:scale(.8) rotate(-8deg)}18%{left:25%;top:26%;transform:scale(1) rotate(10deg)}37%{left:53%;top:35%;transform:scale(.9) rotate(-5deg)}58%{left:77%;top:22%;transform:scale(.75) rotate(12deg)}78%{left:62%;top:49%;transform:scale(1) rotate(-12deg)}100%{left:8%;top:42%;transform:scale(.8) rotate(-8deg)}}
+@keyframes butterflyFlutter{from{margin-top:-3px;filter:drop-shadow(0 0 5px #a8f3dc77)}to{margin-top:4px;filter:drop-shadow(0 0 12px #a8f3dcbb)}}
+@media(prefers-reduced-motion:reduce){.wild-flora,.garden-butterfly,.habitat-plant img{animation:none!important}}
