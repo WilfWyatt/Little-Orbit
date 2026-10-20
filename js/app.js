@@ -13,7 +13,7 @@
     explore:["You found a glittering pebble!","A new smell. Fascinating.","A tiny mystery for the journal."]
   };
   function say(message) { pet.mood = message; $("pet-mood").textContent = message; }
-  let reactionTimer, effectTimer, dirtLevel = 0, exploreBoosts = 0, exploreDay = "";
+  let reactionTimer, effectTimer, dirtLevel = 0, exploreBoosts = 0, exploreDay = "", activeExpression = "idle";
   const effectSymbols = {feed:["✦","·","✧"],play:["✦","✧","·","✦"],clean:["○","○","✧","✦","✧","✦"],rest:["Z","z","Z","z"],cuddle:["♡","♥","♡","♥","♡"],explore:["✧","✦","·","✧"]};
   function spawnEffects(action) {
     const layer=$("pet-effects"); layer.innerHTML=""; layer.className=`pet-effects effects-${action}`;
@@ -32,19 +32,19 @@
     if(action!=="rest") effectTimer=setTimeout(()=>{layer.innerHTML="";layer.className="pet-effects";},action==="clean"?2200:action==="cuddle"?2400:1800);
   }
   function react(action) {
-    const art=$("pet-art"), reaction=$("pet-reaction"), mouth=$("pet-mouth"), eyes=$("pet-closed-eyes");
+    const art=$("pet-art"), reaction=$("pet-reaction");
     clearTimeout(reactionTimer);
-    art.classList.remove("react-bounce","react-wiggle","react-snooze","react-run");
-    mouth.classList.toggle("open",action==="feed");
-    eyes.classList.toggle("closed",action==="rest");
-    art.classList.add(action==="play"?"react-run":action==="rest"?"react-snooze":action==="cuddle"?"react-bounce":"react-bounce");
+    art.classList.remove("react-bounce","react-wiggle","react-snooze","react-run","react-feed");
+    activeExpression = action === "rest" ? "rest" : action === "feed" ? "feed" : "idle";
+    art.src = artForPet();
+    art.classList.add(action==="play"?"react-run":action==="rest"?"react-snooze":action==="feed"?"react-feed":"react-bounce");
     reaction.textContent=action==="feed"?"nom nom":action==="play"?"✨":action==="clean"?"✦":action==="rest"?"":"♡";
     reaction.className=`pet-reaction reaction-${action}${action==="rest"?"":" pop"}`;
     spawnEffects(action);
     if(action!=="rest") {
       reactionTimer=setTimeout(()=>{
-        art.classList.remove("react-bounce","react-wiggle","react-snooze","react-run");
-        mouth.classList.remove("open"); eyes.classList.remove("closed"); reaction.classList.remove("pop");
+        art.classList.remove("react-bounce","react-wiggle","react-snooze","react-run","react-feed");
+        activeExpression = "idle"; art.src = artForPet(); reaction.classList.remove("pop");
       },action==="clean"?2200:1600);
     }
   }
@@ -65,12 +65,18 @@
   function setNeed(key, delta) { pet.needs[key] = PetModel.clamp(pet.needs[key] + delta); }
   function adjustTrait(key, delta) { pet.traits[key] = PetModel.clamp(pet.traits[key] + delta); }
   function artForPet() {
-    if (pet.evolvedForm) return PetEvolution.forms[pet.evolvedForm].art;
-    return pet.stage === "juvenile" ? "assets/juvenile.svg" : "assets/hatchling.svg";
+    let base;
+    if (pet.evolvedForm) base = PetEvolution.forms[pet.evolvedForm].art;
+    else base = pet.stage === "juvenile" ? "assets/juvenile.svg" : "assets/hatchling.svg";
+    if (activeExpression === "idle") return base;
+    const variant = activeExpression === "rest" ? "sleep" : activeExpression === "feed" ? "feed" : "";
+    if (!variant) return base;
+    return base.replace(/\.svg$/, `-${variant}.svg`);
   }
   function render() {
     $("pet-name").textContent=pet.name;
-    $("pet-art").src=artForPet();
+    const desiredArt=artForPet();
+    if ($("pet-art").getAttribute("src") !== desiredArt) $("pet-art").src=desiredArt;
     $("pet-art").alt=`${pet.name}, your ${pet.stage === "adult" ? PetEvolution.forms[pet.evolvedForm].name : pet.stage + " alien"}`;
     dirtLevel=Number.isFinite(pet.dirtLevel)?pet.dirtLevel:0; renderDirt();
     $("stage-label").textContent=`${pet.stage.toUpperCase()} · DAY ${Math.max(1,Math.floor(pet.ageHours/24)+1)}`;
