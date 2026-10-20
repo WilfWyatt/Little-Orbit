@@ -15,6 +15,64 @@
   function say(message) { pet.mood = message; $("pet-mood").textContent = message; }
   let reactionTimer, effectTimer, dirtLevel = 0, exploreBoosts = 0, exploreDay = "", activeExpression = "idle";
   const effectSymbols = {feed:["✦","·","✧"],play:["✦","✧","·","✦"],clean:["○","○","✧","✦","✧","✦"],rest:["Z","z","Z","z"],cuddle:["♡","♥","♡","♥","♡"],explore:["✧","✦","·","✧"]};
+  const discoveryCatalogue = [
+    {id:"moonflower",name:"Moonflower Seed",kind:"seed",icon:"✿",rarity:"Common",desc:"A pale seed that opens only beneath two moons.",plant:"Moonflower",decor:"✿"},
+    {id:"glowmoth",name:"Glow-moth",kind:"life",icon:"🦋",rarity:"Common",desc:"A tiny fluttering visitor drawn to gentle light."},
+    {id:"meteor-glass",name:"Meteor Glass",kind:"keepsake",icon:"◇",rarity:"Common",desc:"A smooth fragment that catches starlight."},
+    {id:"singing-shell",name:"Singing Shell",kind:"keepsake",icon:"◖",rarity:"Uncommon",desc:"It hums softly when the nebula winds rise."},
+    {id:"singing-seed",name:"Chorus Seed",kind:"seed",icon:"❋",rarity:"Uncommon",desc:"Plant it and it will sing to the evening sky.",plant:"Chorus Bloom",decor:"❋"},
+    {id:"crystal-moss",name:"Star-moss",kind:"seed",icon:"❈",rarity:"Uncommon",desc:"Velvety moss that glimmers in the dark.",plant:"Star-moss",decor:"❈"},
+    {id:"tiny-monolith",name:"Tiny Monolith",kind:"decor",icon:"▰",rarity:"Rare",desc:"A mysterious little stone with no visible markings.",decor:"▰"},
+    {id:"comet-feather",name:"Comet Feather",kind:"keepsake",icon:"➶",rarity:"Rare",desc:"Weightless, cool to the touch, and faintly luminous."},
+    {id:"orbit-orchid",name:"Orbit Orchid Seed",kind:"seed",icon:"✺",rarity:"Rare",desc:"A rare seed that grows in spirals, not stems.",plant:"Orbit Orchid",decor:"✺"},
+    {id:"echo-stone",name:"Echo Stone",kind:"decor",icon:"◈",rarity:"Very rare",desc:"It repeats the last note of a sound you make.",decor:"◈"}
+  ];
+  const plantArt = {"Moonflower":"✿","Chorus Bloom":"❋","Star-moss":"❈","Orbit Orchid":"✺"};
+  function ensureWorldData(){
+    if(!pet.collection) pet.collection={};
+    if(!Array.isArray(pet.planted)) pet.planted=[];
+    if(!Array.isArray(pet.decorations)) pet.decorations=[];
+    if(!pet.plantGrowth) pet.plantGrowth={};
+    if(!pet.exploration) pet.exploration={lastAt:0,total:0};
+  }
+  function discoverSomething(){
+    ensureWorldData();
+    const undiscovered=discoveryCatalogue.filter(d=>!pet.collection[d.id]);
+    // Common finds are more likely; rarities remain possible, and each expedition is never guaranteed new.
+    const pool=undiscovered.length?discoveryCatalogue.filter(d=>!pet.collection[d.id] || Math.random()<0.13):discoveryCatalogue;
+    const weights=pool.map(d=>d.rarity==="Common"?6:d.rarity==="Uncommon"?3:d.rarity==="Rare"?1.2:.35);
+    let pick=Math.random()*weights.reduce((a,b)=>a+b,0), chosen=pool[0];
+    for(let i=0;i<pool.length;i++){pick-=weights[i];if(pick<=0){chosen=pool[i];break;}}
+    const isNew=!pet.collection[chosen.id];
+    pet.collection[chosen.id]=(pet.collection[chosen.id]||0)+1;
+    pet.exploration.total=(pet.exploration.total||0)+1;pet.exploration.lastAt=Date.now();
+    return {item:chosen,isNew};
+  }
+  function renderCollection(){
+    ensureWorldData();
+    const found=discoveryCatalogue.filter(d=>pet.collection[d.id]);
+    $("collection-badge").textContent=found.length;
+    $("collection-progress").textContent=`${found.length} / ${discoveryCatalogue.length}`;
+    $("collection-headline").textContent=found.length===discoveryCatalogue.length?"A complete little universe!":"Every little mystery matters.";
+    $("collection-subline").textContent=`${found.length} of ${discoveryCatalogue.length} species and curiosities found · ${pet.exploration.total||0} expeditions`; 
+    $("collection-grid").innerHTML=discoveryCatalogue.map(d=>{const count=pet.collection[d.id]||0;return `<article class="specimen ${count?'found':'unknown'}"><div class="specimen-art">${count?d.icon:'?'}</div><div class="specimen-copy"><strong>${count?d.name:'Undiscovered mystery'}</strong><span class="rarity rarity-${d.rarity.toLowerCase().replace(' ','-')}">${count?d.rarity:'Unknown rarity'}</span><p>${count?d.desc:'Explore the little world to learn what this could be.'}</p>${count>1?`<small>Found ${count} times</small>`:''}</div></article>`}).join("");
+  }
+  function renderHabitat(){
+    ensureWorldData();
+    const plants=$("habitat-plants"),decor=$("habitat-decor");
+    plants.innerHTML=pet.planted.map((name,i)=>{const progress=Math.min(100,Math.floor((Date.now()-(pet.plantGrowth[name]||Date.now()))/3600000*20));return `<span class="habitat-plant plant-${i%4}" title="${escapeHtml(name)} · ${progress}% grown"><i>${plantArt[name]||'✿'}</i><small>${progress>=100?'Blooming':progress>=50?'Growing':'Sprout'}</small></span>`}).join("");
+    decor.innerHTML=pet.decorations.map((symbol,i)=>`<span class="habitat-decoration decor-${i%4}">${symbol}</span>`).join("");
+    $("planted-count").textContent=pet.planted.length;$("decor-count").textContent=pet.decorations.length;$("habitat-days").textContent=`Day ${Math.max(1,Math.floor(pet.ageHours/24)+1)}`;
+    $("habitat-status").textContent=pet.planted.length?"Something is growing":"A world to make your own";
+    const owned=discoveryCatalogue.filter(d=>(pet.collection[d.id]||0)>0 && (d.kind==='seed'||d.kind==='decor'));
+    $("habitat-inventory-list").innerHTML=owned.length?owned.map(d=>{const planted=d.plant&&pet.planted.includes(d.plant);const placed=d.decor&&pet.decorations.filter(x=>x===d.decor).length;return `<article class="inventory-item"><span class="inventory-icon">${d.icon}</span><div><strong>${d.name}</strong><small>${d.plant?(planted?'Already planted': 'Can be planted'):d.decor?(placed?'Decoration unlocked':'Habitat keepsake'):'Keepsake'}</small></div>${d.plant?`<button class="mini-button" data-plant="${d.id}" ${planted?'disabled':''}>${planted?'Planted':'Plant'}</button>`:d.decor?`<button class="mini-button" data-decor="${d.id}">Place</button>`:''}</article>`}).join(""):'<p class="empty-inventory">Your first seed or keepsake is out there waiting. Try an expedition!</p>';
+    $("habitat-inventory-list").querySelectorAll('[data-plant]').forEach(b=>b.addEventListener('click',()=>plantDiscovery(b.dataset.plant)));
+    $("habitat-inventory-list").querySelectorAll('[data-decor]').forEach(b=>b.addEventListener('click',()=>placeDecoration(b.dataset.decor)));
+  }
+  function plantDiscovery(id){const d=discoveryCatalogue.find(x=>x.id===id);if(!d||!d.plant||pet.planted.includes(d.plant))return;pet.planted.push(d.plant);pet.plantGrowth[d.plant]=Date.now();note(`${pet.name} planted a ${d.name.toLowerCase()} in the habitat.`);render();toast(`${d.plant} planted! Give it time to grow.`);}
+  function placeDecoration(id){const d=discoveryCatalogue.find(x=>x.id===id);if(!d||!d.decor)return;pet.decorations.push(d.decor);note(`${pet.name} added a ${d.name.toLowerCase()} to the habitat.`);render();toast('A little keepsake for home!');}
+  function setView(view){document.querySelectorAll('.world-view').forEach(el=>el.hidden=el.id!==`${view}-view`);document.querySelectorAll('.world-tab').forEach(el=>el.classList.toggle('active',el.dataset.view===view));if(view==='habitat')renderHabitat();if(view==='collection')renderCollection();window.scrollTo({top:0,behavior:'smooth'});}
+
   function spawnEffects(action) {
     const layer=$("pet-effects"); layer.innerHTML=""; layer.className=`pet-effects effects-${action}`;
     const symbols=effectSymbols[action]||["✦"];
@@ -74,6 +132,7 @@
     return base.replace(/\.svg$/, `-${variant}.svg`);
   }
   function render() {
+    if(pet) ensureWorldData();
     $("pet-name").textContent=pet.name;
     const desiredArt=artForPet();
     if ($("pet-art").getAttribute("src") !== desiredArt) $("pet-art").src=desiredArt;
@@ -93,6 +152,7 @@
     $("traits-list").innerHTML=Object.entries(pet.traits).map(([key,v])=>`<div class="trait-row"><span class="trait-name">${traitNames[key]}</span><div class="trait-track"><div class="trait-fill" style="width:${v}%"></div></div><span class="trait-number">${v}</span></div>`).join("");
     $("journal-count").textContent=`${pet.journal.length} ${pet.journal.length===1?"note":"notes"}`;
     $("journal-list").innerHTML=pet.journal.length?pet.journal.slice(0,5).map(j=>`<li><span class="journal-dot">✦</span><span>${escapeHtml(j.text)}</span></li>`).join(""):'<li class="empty-journal">Your story is just beginning.</li>';
+    renderCollection(); renderHabitat();
     PetSave.save(pet);
   }
   function escapeHtml(s) { return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
@@ -107,10 +167,10 @@
       explore:()=>{
         setNeed("energy",-19);setNeed("hunger",-13);setNeed("cleanliness",-15);setNeed("happiness",10);dirtLevel=Math.min(100,dirtLevel+18);
         const today=new Date().toISOString().slice(0,10);if(pet.exploreDay!==today){pet.exploreDay=today;pet.exploreBoosts=0;}
-        const discoveries=["a glittering pebble","a tiny moonflower","a strange musical shell","a speck of meteor glass","a singing seed","a sleepy glow-moth"];
-        const found=discoveries[Math.floor(Math.random()*discoveries.length)];
-        if((pet.exploreBoosts||0)<3){const trait=["curiosity","independence","energy","calmness","sociability"][Math.floor(Math.random()*5)];const boost=2+Math.floor(Math.random()*3);adjustTrait(trait,boost);pet.exploreBoosts=(pet.exploreBoosts||0)+1;note(`${pet.name} discovered ${found} and gained ${boost} ${trait}. (${pet.exploreBoosts}/3 exploration boosts today)`);say(`Found ${found}! ${trait[0].toUpperCase()+trait.slice(1)} +${boost}`);}
-        else {note(`${pet.name} discovered ${found}, but was too tired for another personality boost today.`);say(`You found ${found}! That was quite an adventure.`);}
+        const result=discoverSomething(), found=result.item;
+        if((pet.exploreBoosts||0)<3){const trait=["curiosity","independence","energy","calmness","sociability"][Math.floor(Math.random()*5)];const boost=2+Math.floor(Math.random()*3);adjustTrait(trait,boost);pet.exploreBoosts=(pet.exploreBoosts||0)+1;note(`${pet.name} ${result.isNew?'discovered':'found another'} ${found.name}${result.isNew?'':' (duplicate)'} and gained ${boost} ${trait}. (${pet.exploreBoosts}/3 exploration boosts today)`);say(`${result.isNew?'New discovery':'Another find'}: ${found.name}! ${trait} +${boost}`);}
+        else {note(`${pet.name} ${result.isNew?'discovered':'found another'} ${found.name}${result.isNew?'':' (duplicate)'}, but was too tired for another personality boost today.`);say(`${result.isNew?'New discovery':'Another find'}: ${found.name}!`);}
+        if(found.kind==='seed'&&result.isNew)say(`You found ${found.name}! You can plant it at home.`);
       }
     };
     changes[action]?.();
@@ -137,6 +197,7 @@
     doAction(btn.dataset.action);
     // On phones, keep care one tap away and bring the pet back into view to show the reaction.
     if(btn.closest(".care-dock")) {
+      setView("pet");
       window.setTimeout(()=>document.querySelector(".pet-card")?.scrollIntoView({behavior:"smooth",block:"start"}),40);
     }
   }));
@@ -147,6 +208,7 @@
   });
   $("export-button").addEventListener("click",()=>{PetSave.exportSave(pet);toast("Save exported.");});
   const titleScreen=$("title-screen"), gameScreen=$("game-screen");
+  document.querySelectorAll("[data-view]").forEach(btn=>btn.addEventListener("click",()=>setView(btn.dataset.view)));
   let soundEnabled=localStorage.getItem("littleOrbit.sound")!=="off";
   function syncSound(){const b=$("title-sound-toggle");b.textContent=soundEnabled?"♫":"♪̸";b.setAttribute("aria-label",soundEnabled?"Mute sound":"Enable sound");b.classList.toggle("sound-off",!soundEnabled);}
   syncSound();
