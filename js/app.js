@@ -94,7 +94,13 @@
     pet=PetModel.defaultPet((name||"Pip").trim().slice(0,18)||"Pip");
     PetSave.save(pet); $("welcome-dialog").close(); render(); toast(`${pet.name} has arrived!`);
   }
-  document.querySelectorAll("[data-action]").forEach(btn=>btn.addEventListener("click",()=>doAction(btn.dataset.action)));
+  document.querySelectorAll("[data-action]").forEach(btn=>btn.addEventListener("click",()=>{
+    doAction(btn.dataset.action);
+    // On phones, keep care one tap away and bring the pet back into view to show the reaction.
+    if(btn.closest(".care-dock")) {
+      window.setTimeout(()=>document.querySelector(".pet-card")?.scrollIntoView({behavior:"smooth",block:"start"}),40);
+    }
+  }));
   $("welcome-form").addEventListener("submit",e=>{e.preventDefault();start($("new-name").value);});
   $("rename-button").addEventListener("click",()=>{
     const name=prompt("What shall we call your alien?",pet.name);
