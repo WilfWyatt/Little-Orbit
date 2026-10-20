@@ -1,4 +1,4 @@
-const CACHE = "little-orbit-v1";
+const CACHE = "little-orbit-v2";
 const CORE = ["./","./index.html","./styles.css","./manifest.webmanifest","./js/pet.js","./js/time.js","./js/evolution.js","./js/save.js","./js/app.js","./assets/icon.svg","./assets/hatchling.svg","./assets/juvenile.svg","./assets/seeker.svg","./assets/wisp.svg","./assets/spark.svg"];
 self.addEventListener("install",e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting())));
 self.addEventListener("activate",e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
