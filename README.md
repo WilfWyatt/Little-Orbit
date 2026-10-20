@@ -46,3 +46,10 @@ Upload the full contents of this ZIP to the repository root. Keep `assets/` and 
 - Zs drift upwards from above Jeff’s head in a staggered, looping stream.
 - Jeff settles into a gentle breathing animation and stays asleep until another care action is chosen.
 - Bumped the service-worker cache so GitHub Pages can load the fix.
+
+
+## v0.4.2 — Native expressions
+- Replaced the CSS eye/mouth overlays with matching SVG expression assets for feeding and sleeping.
+- Sleep now uses real closed-eye artwork; feeding uses a mouth drawn into the matching character art.
+- The existing character art, colours, stage variants, care mechanics and save data are retained.
+- Bumped the service-worker cache and precached all expression assets.
