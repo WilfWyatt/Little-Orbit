@@ -27,7 +27,9 @@
     {id:"orbit-orchid",name:"Orbit Orchid Seed",kind:"seed",icon:"✺",rarity:"Rare",desc:"A rare seed that grows in spirals, not stems.",plant:"Orbit Orchid",decor:"✺"},
     {id:"echo-stone",name:"Echo Stone",kind:"decor",icon:"◈",rarity:"Very rare",desc:"It repeats the last note of a sound you make.",decor:"◈"}
   ];
-  const plantArt = {"Moonflower":"plant-moonflower.svg","Chorus Bloom":"plant-chorus.svg","Star-moss":"plant-starmoss.svg","Orbit Orchid":"plant-orchid.svg"};
+  const plantArt = {"Moonflower":"moonflower","Chorus Bloom":"chorus","Star-moss":"starmoss","Orbit Orchid":"orchid"};
+  const rockCount = 7;
+  function seeded(n){ const x=Math.sin((n+17)*127.1)*43758.5453; return x-Math.floor(x); }
   const gardenSeedlings = [
     {x:7,b:43,w:22,h:30,t:0},{x:23,b:39,w:16,h:23,t:1},{x:34,b:44,w:19,h:27,t:2},
     {x:63,b:42,w:18,h:25,t:1},{x:76,b:39,w:23,h:31,t:0},{x:90,b:43,w:15,h:21,t:2},
@@ -39,6 +41,7 @@
     if(!Array.isArray(pet.planted)) pet.planted=[];
     if(!Array.isArray(pet.decorations)) pet.decorations=[];
     if(!pet.plantGrowth) pet.plantGrowth={};
+    if(!pet.plantBloomed) pet.plantBloomed={};
     if(!pet.exploration) pet.exploration={lastAt:0,total:0};
   }
   function discoverSomething(){
@@ -65,23 +68,45 @@
   }
   function renderHabitat(){
     ensureWorldData();
+    if(!pet.plantBloomed) pet.plantBloomed={};
     const plants=$("habitat-plants"),decor=$("habitat-decor"),base=$("habitat-baseflora"),wildlife=$("habitat-wildlife");
-    // Deterministic procedural garden: the base flora and stones are scattered from fixed layout seeds,
-    // while planted species and keepsakes are added in their own layer. Layout stays stable between renders.
-    base.innerHTML = gardenSeedlings.map((f,i)=>`<span class="wild-flora flora-${f.t}" style="left:${f.x}%;bottom:${f.b}px;width:${f.w}px;height:${f.h}px;--sway:${(i%4)+3}s;animation-delay:-${i%5}s"><i></i><i></i><i></i></span>`).join("") + gardenStones.map((r,i)=>`<img class="garden-stone stone-${i%3}" src="assets/alien-stone.svg" alt="" style="left:${r.x}%;bottom:${r.b}px;width:${r.w}px">`).join("");
-    plants.innerHTML=pet.planted.map((name,i)=>{const progress=Math.min(100,Math.floor((Date.now()-(pet.plantGrowth[name]||Date.now()))/3600000*20));const asset=plantArt[name]||"plant-moonflower.svg";const x=[18,39,61,78][i%4];const bottom=48+(i%2)*7;return `<span class="habitat-plant plant-${i%4}" style="left:${x}%;bottom:${bottom}px" title="${escapeHtml(name)} · ${progress}% grown"><img src="assets/${asset}" alt="${escapeHtml(name)}" style="width:${progress>=100?48:40}px;height:${progress>=100?58:49}px"><small>${progress>=100?'Blooming':progress>=50?'Growing':'Sprout'}</small></span>`}).join("");
+    // Stable procedural garden: seeded placements avoid reshuffling whenever a button is tapped.
+    const flora=[];
+    for(let i=0;i<19;i++){
+      const x=4+seeded(i+1)*92, bottom=25+Math.floor(seeded(i+43)*55), w=17+Math.floor(seeded(i+80)*25), h=23+Math.floor(seeded(i+120)*30), t=i%4;
+      flora.push(`<span class="wild-flora flora-${t}" style="left:${x}%;bottom:${bottom}px;width:${w}px;height:${h}px;--sway:${3+Math.floor(seeded(i+8)*4)}s;animation-delay:-${Math.floor(seeded(i+12)*5)}s"><i></i><i></i><i></i><b></b></span>`);
+    }
+    const stones=[];
+    for(let i=0;i<15;i++){
+      const x=3+seeded(i+200)*93, bottom=12+Math.floor(seeded(i+240)*35), w=17+Math.floor(seeded(i+280)*32), r=1+Math.floor(seeded(i+320)*rockCount);
+      stones.push(`<img class="garden-stone rock-${r}" src="assets/rock-${r}.svg" alt="" style="left:${x}%;bottom:${bottom}px;width:${w}px;z-index:${Math.round(bottom/8)}">`);
+    }
+    base.innerHTML=stones.join("")+flora.join("");
+    plants.innerHTML=pet.planted.map((name,i)=>{
+      const plantedAt=pet.plantGrowth[name]||Date.now();
+      const progress=Math.min(100,Math.floor((Date.now()-plantedAt)/3600000*20));
+      const id=plantArt[name]||"moonflower"; const bloomed=!!pet.plantBloomed[name];
+      const stage=bloomed?"bloom":progress>=100?"ready":progress>=20?"growing":"sprout";
+      const asset=stage==="ready"?`flower-${id}-growing.svg`: `flower-${id}-${stage==="bloom"?"bloom":stage}.svg`;
+      const x=[16,37,62,82,27,73][i%6], bottom=44+(i%3)*7;
+      const label=bloomed?"In bloom":stage==="ready"?"Tap to bloom":stage==="growing"?"Growing":"Sprout";
+      return `<button class="habitat-plant plant-${i%4} stage-${stage}" data-bloom="${escapeHtml(name)}" ${stage!=="ready"?"disabled":""} style="left:${x}%;bottom:${bottom}px" title="${escapeHtml(name)} · ${label}" aria-label="${escapeHtml(name)}: ${label}"><img src="assets/${asset}" alt=""><small>${label}</small>${stage==="ready"?'<span class="ready-sparkles" aria-hidden="true">✦ ✧ ✦</span>':""}</button>`;
+    }).join("");
+    plants.querySelectorAll('[data-bloom]').forEach(b=>b.addEventListener('click',()=>bloomPlant(b.dataset.bloom)));
     decor.innerHTML=pet.decorations.map((symbol,i)=>{const x=[27,53,70,42,86][i%5];return `<span class="habitat-decoration decor-${i%4}" style="left:${x}%;bottom:${52+(i%3)*7}px">${symbol}</span>`}).join("");
     const hasButterfly=!!(pet.collection&&pet.collection.glowmoth);
     wildlife.innerHTML=hasButterfly?'<img class="garden-butterfly" src="assets/glow-butterfly.svg" alt="Your glow-moth fluttering around the garden" title="Glow-moth">':'';
     $("planted-count").textContent=pet.planted.length;$("decor-count").textContent=pet.decorations.length;$("habitat-days").textContent=`Day ${Math.max(1,Math.floor(pet.ageHours/24)+1)}`;
-    $("habitat-status").textContent=pet.planted.length?"Something is growing":"A world to make your own";
+    $("habitat-status").textContent=pet.planted.some(n=>pet.plantBloomed[n])?"A tiny alien garden in bloom":pet.planted.length?"Little buds are growing":"A world to make your own";
     const owned=discoveryCatalogue.filter(d=>(pet.collection[d.id]||0)>0 && (d.kind==='seed'||d.kind==='decor'));
-    $("habitat-inventory-list").innerHTML=owned.length?owned.map(d=>{const planted=d.plant&&pet.planted.includes(d.plant);const placed=d.decor&&pet.decorations.filter(x=>x===d.decor).length;return `<article class="inventory-item"><span class="inventory-icon">${d.icon}</span><div><strong>${d.name}</strong><small>${d.plant?(planted?'Already planted': 'Can be planted'):d.decor?(placed?'Decoration unlocked':'Habitat keepsake'):'Keepsake'}</small></div>${d.plant?`<button class="mini-button" data-plant="${d.id}" ${planted?'disabled':''}>${planted?'Planted':'Plant'}</button>`:d.decor?`<button class="mini-button" data-decor="${d.id}">Place</button>`:''}</article>`}).join(""):'<p class="empty-inventory">Your first seed or keepsake is out there waiting. Try an expedition!</p>';
+    $("habitat-inventory-list").innerHTML=owned.length?owned.map(d=>{const planted=d.plant&&pet.planted.includes(d.plant);const placed=d.decor&&pet.decorations.filter(x=>x===d.decor).length;return `<article class="inventory-item"><span class="inventory-icon">${d.icon}</span><div><strong>${d.name}</strong><small>${d.plant?(planted?(pet.plantBloomed[d.plant]?'Blooming beautifully':'Already planted'):'Can be planted'):d.decor?(placed?'Decoration unlocked':'Habitat keepsake'):'Keepsake'}</small></div>${d.plant?`<button class="mini-button" data-plant="${d.id}" ${planted?'disabled':''}>${planted?'Planted':'Plant'}</button>`:d.decor?`<button class="mini-button" data-decor="${d.id}">Place</button>`:''}</article>`}).join(''):'<p class="empty-inventory">Your first seed or keepsake is out there waiting. Try an expedition!</p>';
     $("habitat-inventory-list").querySelectorAll('[data-plant]').forEach(b=>b.addEventListener('click',()=>plantDiscovery(b.dataset.plant)));
     $("habitat-inventory-list").querySelectorAll('[data-decor]').forEach(b=>b.addEventListener('click',()=>placeDecoration(b.dataset.decor)));
   }
-  function plantDiscovery(id){const d=discoveryCatalogue.find(x=>x.id===id);if(!d||!d.plant||pet.planted.includes(d.plant))return;pet.planted.push(d.plant);pet.plantGrowth[d.plant]=Date.now();note(`${pet.name} planted a ${d.name.toLowerCase()} in the habitat.`);render();toast(`${d.plant} planted! Give it time to grow.`);}
-  function placeDecoration(id){const d=discoveryCatalogue.find(x=>x.id===id);if(!d||!d.decor)return;pet.decorations.push(d.decor);note(`${pet.name} added a ${d.name.toLowerCase()} to the habitat.`);render();toast('A little keepsake for home!');}
+  function bloomPlant(name){
+    if(!pet.planted.includes(name)||!pet.plantGrowth[name]||((Date.now()-pet.plantGrowth[name])/3600000)<5||pet.plantBloomed[name]) return;
+    pet.plantBloomed[name]=true; note(`${name} opened its petals in a shower of stardust.`); render(); toast(`${name} bloomed! ✨`);
+  }
   function setView(view){document.querySelectorAll('.world-view').forEach(el=>el.hidden=el.id!==`${view}-view`);document.querySelectorAll('.world-tab').forEach(el=>el.classList.toggle('active',el.dataset.view===view));if(view==='habitat')renderHabitat();if(view==='collection')renderCollection();window.scrollTo({top:0,behavior:'smooth'});}
 
   function spawnEffects(action) {
