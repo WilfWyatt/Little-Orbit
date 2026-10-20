@@ -13,6 +13,24 @@
     explore:["You found a glittering pebble!","A new smell. Fascinating.","A tiny mystery for the journal."]
   };
   function say(message) { pet.mood = message; $("pet-mood").textContent = message; }
+  let reactionTimer;
+  function react(action) {
+    const art = $("pet-art"), reaction = $("pet-reaction");
+    const styles = { feed: ["react-bounce", "✦"], play: ["react-wiggle", "✨"], clean: ["react-bounce", "✧"], rest: ["react-snooze", "Z z"], cuddle: ["react-bounce", "♡"], explore: ["react-wiggle", "❇"] };
+    const [animation, symbol] = styles[action] || styles.cuddle;
+    art.classList.remove("react-bounce", "react-wiggle", "react-snooze", "evolved-pop");
+    reaction.classList.remove("pop");
+    void art.offsetWidth;
+    art.classList.add(animation);
+    reaction.textContent = symbol;
+    void reaction.offsetWidth;
+    reaction.classList.add("pop");
+    clearTimeout(reactionTimer);
+    reactionTimer = setTimeout(() => {
+      art.classList.remove("react-bounce", "react-wiggle", "react-snooze");
+      reaction.classList.remove("pop");
+    }, 1100);
+  }
   function toast(message) {
     const el=$("toast"); el.textContent=message; el.classList.add("show");
     clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.classList.remove("show"),2200);
@@ -62,6 +80,7 @@
     pet.actions[action]=(pet.actions[action]||0)+1;
     pet.lastSeen=Date.now();
     say(messages[action][Math.floor(Math.random()*messages[action].length)]);
+    react(action);
     if (action!=="explore") note(`${pet.name} spent a little time with you: ${action}.`);
     const result=PetEvolution.updateStage(pet);
     render();

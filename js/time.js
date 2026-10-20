@@ -1,6 +1,7 @@
 /* Real-time needs and forgiving offline progression */
 (() => {
-  const PER_HOUR = { hunger: 4.0, energy: 3.0, happiness: 1.6, cleanliness: 1.5, health: 0.35 };
+  // Slightly livelier needs: noticeable over a few hours, still gentle overnight.
+  const PER_HOUR = { hunger: 5.0, energy: 3.5, happiness: 2.0, cleanliness: 1.8, health: 0.35 };
   function advance(pet, now = Date.now()) {
     const elapsed = Math.max(0, Math.min(24 * 60 * 60 * 1000, now - (pet.lastSeen || now)));
     const hours = elapsed / 3600000;
