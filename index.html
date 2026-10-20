@@ -18,6 +18,12 @@
   </section>
   <main class="app-shell" id="game-screen" hidden>
 
+    <nav class="world-tabs" aria-label="Your world">
+      <button class="world-tab active" data-view="pet">✦ <span>Jeff</span></button>
+      <button class="world-tab" data-view="habitat">☘ <span>Habitat</span></button>
+      <button class="world-tab" data-view="collection">⌕ <span>Collection</span><b id="collection-badge">0</b></button>
+    </nav>
+    <section id="pet-view" class="world-view">
     <section class="pet-card" aria-label="Your alien">
       <div class="sky-decoration star star-a">✦</div><div class="sky-decoration star star-b">·</div>
       <div class="sky-decoration planet">◕</div>
@@ -66,6 +72,27 @@
       <ul id="journal-list" class="journal-list"></ul>
     </section>
 
+    </section>
+    <section id="habitat-view" class="world-view" hidden>
+      <section class="habitat-card">
+        <div class="section-heading"><div><p class="eyebrow">A LITTLE PATCH OF SPACE</p><h2>Your habitat</h2></div><span class="habitat-status" id="habitat-status">Growing gently</span></div>
+        <p class="muted">A home for Jeff and the strange little things you bring back. Plant a seed and watch it take root over time.</p>
+        <div id="habitat-scene" class="habitat-scene">
+          <div class="habitat-stars">✦　·　✧　　·　✦</div><div class="habitat-moon">◕</div>
+          <div class="habitat-ground"></div><div id="habitat-plants" class="habitat-plants"></div><div id="habitat-decor" class="habitat-decor"></div>
+          <div class="habitat-sign">JEFF'S LITTLE WORLD</div>
+        </div>
+        <div class="habitat-stats"><div><strong id="planted-count">0</strong><span>Plants growing</span></div><div><strong id="decor-count">0</strong><span>Decorations</span></div><div><strong id="habitat-days">Day 1</strong><span>Since arrival</span></div></div>
+      </section>
+      <section class="habitat-inventory"><div class="section-heading"><div><p class="eyebrow">MAKE IT YOURS</p><h2>Seeds & keepsakes</h2></div></div><div id="habitat-inventory-list" class="inventory-list"></div></section>
+    </section>
+    <section id="collection-view" class="world-view" hidden>
+      <section class="collection-card"><div class="section-heading"><div><p class="eyebrow">FIELD NOTES FROM THE UNKNOWN</p><h2>Discovery journal</h2></div><span id="collection-progress" class="journal-count">0 / 10</span></div>
+        <p class="muted">Every expedition can uncover something new. Discoveries are kept here, even when you close the game.</p>
+        <div class="collection-summary"><span>✧</span><div><strong id="collection-headline">The universe is full of little mysteries.</strong><p id="collection-subline">Take Jeff exploring to begin your collection.</p></div></div>
+        <div id="collection-grid" class="collection-grid"></div>
+      </section>
+    </section>
     <footer><span>Made of stardust and small moments.</span><button id="rename-button" class="text-button">Rename pet</button><button id="export-button" class="text-button">Export save</button></footer>
   </main>
 

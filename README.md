@@ -53,3 +53,10 @@ Upload the full contents of this ZIP to the repository root. Keep `assets/` and 
 - Sleep now uses real closed-eye artwork; feeding uses a mouth drawn into the matching character art.
 - The existing character art, colours, stage variants, care mechanics and save data are retained.
 - Bumped the service-worker cache and precached all expression assets.
+
+
+## Version 0.5 — A Living Little World
+
+This milestone adds three views: Jeff, Habitat and Collection. Exploration can discover 10 catalogue items with rarity tiers. Seeds can be planted in the habitat, decorations can be placed, and discoveries persist in the existing local save. Plant growth advances with elapsed real time (capped by the existing 24-hour offline progression).
+
+The game remains a static HTML/CSS/JavaScript PWA suitable for GitHub Pages. Upload the contents of this ZIP to the repository root, preserving `assets/` and `js/`. Existing v1 saves are migrated in memory with empty habitat/collection data; the original pet name, needs, traits, age and journal are retained.
