@@ -18,21 +18,35 @@
   function spawnEffects(action) {
     const layer=$("pet-effects"); layer.innerHTML=""; layer.className=`pet-effects effects-${action}`;
     const symbols=effectSymbols[action]||["✦"];
-    const count=action==="clean"?18:action==="cuddle"?9:action==="rest"?7:action==="explore"?7:action==="play"?6:5;
-    for(let i=0;i<count;i++){const node=document.createElement("span");node.className=`effect-particle particle-${i%6}`;node.textContent=symbols[i%symbols.length];node.style.setProperty("--delay",`${(i%6)*.12}s`);node.style.setProperty("--drift",`${((i%5)-2)*19}px`);layer.appendChild(node);}
-    clearTimeout(effectTimer); effectTimer=setTimeout(()=>{layer.innerHTML="";layer.className="pet-effects";},action==="clean"?2200:action==="cuddle"?2400:action==="rest"?2600:1800);
+    const count=action==="clean"?18:action==="cuddle"?9:action==="rest"?4:action==="explore"?7:action==="play"?6:5;
+    for(let i=0;i<count;i++){
+      const node=document.createElement("span");
+      node.className=`effect-particle particle-${i%6}`;
+      node.textContent=symbols[i%symbols.length];
+      node.style.setProperty("--delay",`${(i%count)*.42}s`);
+      node.style.setProperty("--drift",`${((i%5)-2)*22}px`);
+      layer.appendChild(node);
+    }
+    clearTimeout(effectTimer);
+    // Rest is a state, not a one-shot burst: keep the snoozing Zs drifting until another action.
+    if(action!=="rest") effectTimer=setTimeout(()=>{layer.innerHTML="";layer.className="pet-effects";},action==="clean"?2200:action==="cuddle"?2400:1800);
   }
   function react(action) {
     const art=$("pet-art"), reaction=$("pet-reaction"), mouth=$("pet-mouth"), eyes=$("pet-closed-eyes");
+    clearTimeout(reactionTimer);
     art.classList.remove("react-bounce","react-wiggle","react-snooze","react-run");
     mouth.classList.toggle("open",action==="feed");
     eyes.classList.toggle("closed",action==="rest");
     art.classList.add(action==="play"?"react-run":action==="rest"?"react-snooze":action==="cuddle"?"react-bounce":"react-bounce");
-    reaction.textContent=action==="feed"?"nom nom":action==="play"?"✨":action==="clean"?"✦":action==="rest"?"Z z z":action==="cuddle"?"♡":"✧";
-    reaction.className=`pet-reaction reaction-${action} pop`;
+    reaction.textContent=action==="feed"?"nom nom":action==="play"?"✨":action==="clean"?"✦":action==="rest"?"":"♡";
+    reaction.className=`pet-reaction reaction-${action}${action==="rest"?"":" pop"}`;
     spawnEffects(action);
-    clearTimeout(reactionTimer);
-    reactionTimer=setTimeout(()=>{art.classList.remove("react-bounce","react-wiggle","react-snooze","react-run");mouth.classList.remove("open");eyes.classList.remove("closed");reaction.classList.remove("pop");},action==="rest"?2800:action==="clean"?2200:1600);
+    if(action!=="rest") {
+      reactionTimer=setTimeout(()=>{
+        art.classList.remove("react-bounce","react-wiggle","react-snooze","react-run");
+        mouth.classList.remove("open"); eyes.classList.remove("closed"); reaction.classList.remove("pop");
+      },action==="clean"?2200:1600);
+    }
   }
   function renderDirt() {
     const layer=$("pet-dirt"); layer.innerHTML=""; layer.classList.toggle("dirty",dirtLevel>0);
