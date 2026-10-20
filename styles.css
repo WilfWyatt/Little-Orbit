@@ -46,9 +46,9 @@ button,input{font:inherit}button{cursor:pointer;-webkit-tap-highlight-color:tran
 .title-sound-toggle.sound-off{background:#111a3020}
 .pet-mouth{position:absolute;z-index:4;left:50%;top:57.7%;width:0;height:0;transform:translate(-50%,-50%);pointer-events:none}
 .pet-mouth.open{width:17px;height:21px;border-radius:50% 50% 55% 55%;background:#29314f;border:2px solid #397d9a;box-shadow:inset 0 -5px 0 #ff9eb7;animation:nomNoms .28s ease-in-out 4 alternate}
-.pet-closed-eyes{display:none;position:absolute;z-index:4;left:50%;top:48.7%;width:56px;transform:translateX(-50%);justify-content:space-between;pointer-events:none}
+.pet-closed-eyes{display:none;position:absolute;z-index:4;left:50%;top:39.5%;width:90px;height:47px;transform:translateX(-50%);justify-content:space-between;pointer-events:none}
 .pet-closed-eyes.closed{display:flex}
-.pet-closed-eyes i{width:20px;height:12px;border-bottom:3px solid #29395e;border-radius:0 0 50% 50%;background:linear-gradient(#8be9d8,#8be9d8);}
+.pet-closed-eyes i{display:block;width:43%;height:100%;border:0;border-bottom:4px solid #29395e;border-radius:0 0 48% 48%;background:linear-gradient(135deg,#8de8d8 0%,#7bded4 60%,#a0efdc 100%);box-shadow:0 2px 0 #397d9a1a;}
 .pet-dirt{position:absolute;z-index:4;inset:0;pointer-events:none}
 .pet-dirt i{position:absolute;width:7px;height:5px;border-radius:50%;background:#8a6a63;box-shadow:0 0 2px #5a4c5b;transform:rotate(-20deg)}
 .pet-effects{position:absolute;z-index:5;inset:0;pointer-events:none;overflow:visible}
@@ -60,7 +60,11 @@ button,input{font:inherit}button{cursor:pointer;-webkit-tap-highlight-color:tran
 .effects-cuddle .effect-particle{top:45%;font-size:24px;color:#ffb5d3;animation:heartFloat 2.1s ease-out var(--delay) both}
 .effects-cuddle .particle-0,.effects-cuddle .particle-3{left:calc(50% - 22px)}
 .effects-cuddle .particle-1,.effects-cuddle .particle-4{left:calc(50% + 12px)}
-.effects-rest .effect-particle{left:calc(50% + var(--drift));top:38%;font-size:20px;color:#d7ceff;animation:snoozeFloat 2.3s ease-out var(--delay) both}
+.effects-rest .effect-particle{left:calc(50% + var(--drift));top:18%;font-size:21px;font-weight:800;color:#d7ceff;text-shadow:0 0 12px #c9b7ff88;animation:snoozeFloat 2.5s ease-in-out var(--delay) infinite}
+.effects-rest .effect-particle:nth-child(2n){top:23%;font-size:17px}
+.effects-rest .effect-particle:nth-child(3n){top:13%;font-size:23px}
+.pet-art.react-snooze{animation:snoozeBreathe 2.6s ease-in-out infinite}
+.pet-reaction.reaction-rest{display:none}
 .effects-play .effect-particle{top:42%;animation:runSpark .75s ease-out var(--delay) both}
 .effects-explore .effect-particle{top:40%;color:#c8c0ff;animation:particleRise 1.6s ease-out var(--delay) both}
 .pet-art.react-run{animation:runAbout .24s ease-in-out 6 alternate}
@@ -73,7 +77,8 @@ button,input{font:inherit}button{cursor:pointer;-webkit-tap-highlight-color:tran
 @keyframes particleRise{0%{opacity:0;transform:translateY(12px) scale(.5) rotate(-15deg)}20%{opacity:1}100%{opacity:0;transform:translateY(-82px) scale(1.15) rotate(25deg)}}
 @keyframes bubbleWash{0%{opacity:0;transform:translateY(22px) scale(.5)}18%{opacity:.9}70%{opacity:.85}100%{opacity:0;transform:translateY(-85px) scale(1.25)}}
 @keyframes heartFloat{0%{opacity:0;transform:translateY(15px) scale(.45)}18%{opacity:1}100%{opacity:0;transform:translateY(-115px) translateX(var(--drift)) scale(1.15) rotate(12deg)}}
-@keyframes snoozeFloat{0%{opacity:0;transform:translateY(5px) scale(.7)}20%{opacity:1}100%{opacity:0;transform:translateY(-68px) translateX(18px) scale(1.15)}}
+@keyframes snoozeFloat{0%{opacity:0;transform:translateY(16px) translateX(-5px) scale(.65) rotate(-8deg)}15%{opacity:.95}75%{opacity:.8}100%{opacity:0;transform:translateY(-92px) translateX(18px) scale(1.12) rotate(10deg)}}
+@keyframes snoozeBreathe{0%,100%{transform:translateY(2px) scale(.985)}50%{transform:translateY(5px) scale(1.015)}}
 @keyframes runSpark{0%{opacity:0;transform:translate(-8px,12px) scale(.6)}25%{opacity:1}100%{opacity:0;transform:translate(18px,-55px) scale(1.1)}}
 @media(prefers-reduced-motion:reduce){.effect-particle,.pet-art.react-run,.pet-mouth.open{animation:none!important}.effect-particle{opacity:.7}}
 .title-sound-toggle.sound-off:after{content:"╱";position:absolute;inset:0;display:grid;place-items:center;color:#f0f5ff;font-size:48px;font-weight:300;text-shadow:0 1px 5px #18243b;pointer-events:none}

@@ -12,7 +12,7 @@ Open `index.html` in a browser. For full PWA/offline support, serve the folder o
 4. Select branch `main` and folder `/ (root)`, then save.
 5. Wait for deployment and open the URL GitHub Pages displays.
 
-## Features in this build (v0.3)
+## Features in this build (v0.4.1)
 - Five care needs and six touch-friendly care actions.
 - Personality traits affected by care choices.
 - Baby, juvenile and three adult evolutionary forms.
@@ -28,7 +28,7 @@ Open `index.html` in a browser. For full PWA/offline support, serve the folder o
 - This is the first playable foundation; sound, more animations, richer habitat interactions and balancing can be added in later versions.
 
 ## Updating an existing GitHub Pages install
-Upload and overwrite the updated files while keeping the `assets` and `js` folders at the repository root. The service-worker cache has been bumped to v3 so the browser can pick up the new build. If the old version remains visible, close the installed app completely and reopen it; if needed, refresh the site once while online.
+Upload and overwrite the updated files while keeping the `assets` and `js` folders at the repository root. The service-worker cache has a new version so the browser can pick up the new build. If the old version remains visible, close the installed app completely and reopen it; if needed, refresh the site once while online.
 
 
 ## Version 0.4 update
@@ -39,3 +39,10 @@ Upload and overwrite the updated files while keeping the `assets` and `js` folde
 - Cleaning removes visible dirt.
 
 Upload the full contents of this ZIP to the repository root. Keep `assets/` and `js/` folders intact.
+
+
+## Version 0.4.1 rest animation fix
+- Rest now closes the eyes with a full eyelid overlay rather than a narrow strip.
+- Zs drift upwards from above Jeff’s head in a staggered, looping stream.
+- Jeff settles into a gentle breathing animation and stays asleep until another care action is chosen.
+- Bumped the service-worker cache so GitHub Pages can load the fix.
