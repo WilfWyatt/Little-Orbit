@@ -127,3 +127,23 @@ button,input{font:inherit}button{cursor:pointer;-webkit-tap-highlight-color:tran
 @keyframes butterflyWander{0%{left:8%;top:42%;transform:scale(.8) rotate(-8deg)}18%{left:25%;top:26%;transform:scale(1) rotate(10deg)}37%{left:53%;top:35%;transform:scale(.9) rotate(-5deg)}58%{left:77%;top:22%;transform:scale(.75) rotate(12deg)}78%{left:62%;top:49%;transform:scale(1) rotate(-12deg)}100%{left:8%;top:42%;transform:scale(.8) rotate(-8deg)}}
 @keyframes butterflyFlutter{from{margin-top:-3px;filter:drop-shadow(0 0 5px #a8f3dc77)}to{margin-top:4px;filter:drop-shadow(0 0 12px #a8f3dcbb)}}
 @media(prefers-reduced-motion:reduce){.wild-flora,.garden-butterfly,.habitat-plant img{animation:none!important}}
+
+/* v0.6: procedural alien rock garden, bespoke flower lifecycle and true wingbeats */
+.habitat-plants{pointer-events:none}
+.habitat-plant{pointer-events:auto;position:absolute;display:flex;flex-direction:column;align-items:center;gap:1px;padding:0;border:0;background:transparent;color:inherit;cursor:default;transform-origin:bottom center;filter:drop-shadow(0 0 8px #8ef0d133);animation:plantSway 4s ease-in-out infinite}
+.habitat-plant:disabled{opacity:1}.habitat-plant[data-bloom]:not(:disabled){cursor:pointer;animation:plantSway 2.7s ease-in-out infinite,bloomReadyPulse 1.5s ease-in-out infinite}
+.habitat-plant img{width:44px;height:57px;object-fit:contain;filter:drop-shadow(0 0 8px #8ef0d155)}
+.habitat-plant small{font-size:8px;color:#d7f7e9;background:#152b3ddd;padding:3px 6px;border-radius:8px;white-space:nowrap}
+.habitat-plant.stage-sprout img{width:34px;height:42px}.habitat-plant.stage-growing img{width:40px;height:51px}.habitat-plant.stage-bloom img{width:52px;height:65px;filter:drop-shadow(0 0 12px #a8f3d988)}
+.ready-sparkles{position:absolute;top:-8px;left:50%;width:82px;transform:translateX(-50%);font-size:12px;letter-spacing:5px;color:#fff0a8;text-shadow:0 0 8px #fff0a8;animation:sparkleReady .9s ease-in-out infinite alternate;pointer-events:none}
+.garden-stone{position:absolute;height:auto;opacity:.98;filter:drop-shadow(0 4px 4px #07122299)}
+.rock-2{filter:hue-rotate(18deg) drop-shadow(0 4px 4px #07122299)}.rock-3{filter:hue-rotate(55deg) drop-shadow(0 4px 4px #07122299)}.rock-4{filter:hue-rotate(100deg) drop-shadow(0 4px 4px #07122299)}.rock-5{filter:hue-rotate(160deg) drop-shadow(0 4px 4px #07122299)}.rock-6{filter:hue-rotate(220deg) drop-shadow(0 4px 4px #07122299)}.rock-7{filter:hue-rotate(280deg) drop-shadow(0 4px 4px #07122299)}
+.wild-flora b{position:absolute;left:34%;bottom:48%;width:35%;height:26%;border-radius:50% 50% 45% 45%;background:radial-gradient(circle at 40% 30%,#fff1bd,#ffbdcf 50%,#bba4ff);box-shadow:0 0 8px #ffd6f488;transform:rotate(-12deg)}
+.flora-1 b{background:radial-gradient(circle at 40% 30%,#fff1bd,#7ee6df 55%,#8f8aff)}.flora-2 b{background:radial-gradient(circle at 40% 30%,#faffd3,#c1a3ff 55%,#7ee6df)}.flora-3 b{background:radial-gradient(circle at 40% 30%,#fff1bd,#ffb5df 55%,#8b8aff)}
+.garden-butterfly{width:46px;height:38px;transform-origin:center;animation:butterflyWander 17s ease-in-out infinite}
+.garden-butterfly .wing{transform-box:fill-box;transform-origin:center;animation:wingBeat .22s ease-in-out infinite alternate}
+.garden-butterfly .wing-left{transform-origin:100% 55%}.garden-butterfly .wing-right{transform-origin:0% 55%}
+@keyframes wingBeat{from{transform:scaleX(1) scaleY(1)}to{transform:scaleX(.2) scaleY(.86)}}
+@keyframes bloomReadyPulse{0%,100%{filter:drop-shadow(0 0 5px #fff0a855)}50%{filter:drop-shadow(0 0 15px #fff0aadd)}}
+@keyframes sparkleReady{from{opacity:.35;transform:translateX(-50%) scale(.85) rotate(-8deg)}to{opacity:1;transform:translateX(-50%) scale(1.12) rotate(8deg)}}
+@media(prefers-reduced-motion:reduce){.garden-butterfly .wing,.ready-sparkles,.habitat-plant{animation:none!important}}
