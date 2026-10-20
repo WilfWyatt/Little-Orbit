@@ -13,23 +13,32 @@
     explore:["You found a glittering pebble!","A new smell. Fascinating.","A tiny mystery for the journal."]
   };
   function say(message) { pet.mood = message; $("pet-mood").textContent = message; }
-  let reactionTimer;
+  let reactionTimer, effectTimer, dirtLevel = 0, exploreBoosts = 0, exploreDay = "";
+  const effectSymbols = {feed:["✦","·","✧"],play:["✦","✧","·","✦"],clean:["○","○","✧","✦","✧","✦"],rest:["Z","z","Z","z"],cuddle:["♡","♥","♡","♥","♡"],explore:["✧","✦","·","✧"]};
+  function spawnEffects(action) {
+    const layer=$("pet-effects"); layer.innerHTML=""; layer.className=`pet-effects effects-${action}`;
+    const symbols=effectSymbols[action]||["✦"];
+    const count=action==="clean"?18:action==="cuddle"?9:action==="rest"?7:action==="explore"?7:action==="play"?6:5;
+    for(let i=0;i<count;i++){const node=document.createElement("span");node.className=`effect-particle particle-${i%6}`;node.textContent=symbols[i%symbols.length];node.style.setProperty("--delay",`${(i%6)*.12}s`);node.style.setProperty("--drift",`${((i%5)-2)*19}px`);layer.appendChild(node);}
+    clearTimeout(effectTimer); effectTimer=setTimeout(()=>{layer.innerHTML="";layer.className="pet-effects";},action==="clean"?2200:action==="cuddle"?2400:action==="rest"?2600:1800);
+  }
   function react(action) {
-    const art = $("pet-art"), reaction = $("pet-reaction");
-    const styles = { feed: ["react-bounce", "✦"], play: ["react-wiggle", "✨"], clean: ["react-bounce", "✧"], rest: ["react-snooze", "Z z"], cuddle: ["react-bounce", "♡"], explore: ["react-wiggle", "❇"] };
-    const [animation, symbol] = styles[action] || styles.cuddle;
-    art.classList.remove("react-bounce", "react-wiggle", "react-snooze", "evolved-pop");
-    reaction.classList.remove("pop");
-    void art.offsetWidth;
-    art.classList.add(animation);
-    reaction.textContent = symbol;
-    void reaction.offsetWidth;
-    reaction.classList.add("pop");
+    const art=$("pet-art"), reaction=$("pet-reaction"), mouth=$("pet-mouth"), eyes=$("pet-closed-eyes");
+    art.classList.remove("react-bounce","react-wiggle","react-snooze","react-run");
+    mouth.classList.toggle("open",action==="feed");
+    eyes.classList.toggle("closed",action==="rest");
+    art.classList.add(action==="play"?"react-run":action==="rest"?"react-snooze":action==="cuddle"?"react-bounce":"react-bounce");
+    reaction.textContent=action==="feed"?"nom nom":action==="play"?"✨":action==="clean"?"✦":action==="rest"?"Z z z":action==="cuddle"?"♡":"✧";
+    reaction.className=`pet-reaction reaction-${action} pop`;
+    spawnEffects(action);
     clearTimeout(reactionTimer);
-    reactionTimer = setTimeout(() => {
-      art.classList.remove("react-bounce", "react-wiggle", "react-snooze");
-      reaction.classList.remove("pop");
-    }, 1100);
+    reactionTimer=setTimeout(()=>{art.classList.remove("react-bounce","react-wiggle","react-snooze","react-run");mouth.classList.remove("open");eyes.classList.remove("closed");reaction.classList.remove("pop");},action==="rest"?2800:action==="clean"?2200:1600);
+  }
+  function renderDirt() {
+    const layer=$("pet-dirt"); layer.innerHTML=""; layer.classList.toggle("dirty",dirtLevel>0);
+    const count=Math.min(10,Math.ceil(dirtLevel/10));
+    const spots=[[35,48],[64,51],[43,61],[57,64],[31,68],[68,69],[47,74],[60,43],[38,41],[55,55]];
+    for(let i=0;i<count;i++){const dot=document.createElement("i");dot.style.left=spots[i][0]+"%";dot.style.top=spots[i][1]+"%";dot.style.opacity=String(.45+((i%3)*.18));layer.appendChild(dot);}
   }
   function toast(message) {
     const el=$("toast"); el.textContent=message; el.classList.add("show");
@@ -49,6 +58,7 @@
     $("pet-name").textContent=pet.name;
     $("pet-art").src=artForPet();
     $("pet-art").alt=`${pet.name}, your ${pet.stage === "adult" ? PetEvolution.forms[pet.evolvedForm].name : pet.stage + " alien"}`;
+    dirtLevel=Number.isFinite(pet.dirtLevel)?pet.dirtLevel:0; renderDirt();
     $("stage-label").textContent=`${pet.stage.toUpperCase()} · DAY ${Math.max(1,Math.floor(pet.ageHours/24)+1)}`;
     const form=PetEvolution.current(pet);
     $("pet-description").textContent=form ? form.description : pet.stage==="juvenile" ? "Growing braver, brighter and more themselves every day." : "A curious little life from somewhere far away.";
@@ -69,17 +79,25 @@
   function doAction(action) {
     if (!pet) return;
     const changes = {
-      feed:()=>{setNeed("hunger",28);setNeed("happiness",4);adjustTrait("calmness",1);},
-      play:()=>{setNeed("happiness",23);setNeed("energy",-13);setNeed("hunger",-5);adjustTrait("energy",5);adjustTrait("sociability",2);},
-      clean:()=>{setNeed("cleanliness",35);setNeed("happiness",3);adjustTrait("calmness",2);},
+      feed:()=>{setNeed("hunger",28);setNeed("happiness",4);setNeed("cleanliness",-5);dirtLevel=Math.min(100,dirtLevel+7);adjustTrait("calmness",1);},
+      play:()=>{setNeed("happiness",23);setNeed("energy",-13);setNeed("hunger",-7);setNeed("cleanliness",-8);dirtLevel=Math.min(100,dirtLevel+12);adjustTrait("energy",5);adjustTrait("sociability",2);},
+      clean:()=>{setNeed("cleanliness",35);setNeed("happiness",3);dirtLevel=Math.max(0,dirtLevel-48);adjustTrait("calmness",2);},
       rest:()=>{setNeed("energy",28);setNeed("happiness",3);adjustTrait("calmness",4);},
       cuddle:()=>{setNeed("happiness",16);adjustTrait("sociability",5);adjustTrait("calmness",1);},
-      explore:()=>{setNeed("energy",-8);setNeed("hunger",-4);setNeed("happiness",12);adjustTrait("curiosity",6);adjustTrait("independence",2);const discoveries=["a glittering pebble","a tiny moonflower","a strange musical shell","a speck of meteor glass"];const found=discoveries[Math.floor(Math.random()*discoveries.length)];note(`${pet.name} discovered ${found}.`);}
+      explore:()=>{
+        setNeed("energy",-19);setNeed("hunger",-13);setNeed("cleanliness",-15);setNeed("happiness",10);dirtLevel=Math.min(100,dirtLevel+18);
+        const today=new Date().toISOString().slice(0,10);if(pet.exploreDay!==today){pet.exploreDay=today;pet.exploreBoosts=0;}
+        const discoveries=["a glittering pebble","a tiny moonflower","a strange musical shell","a speck of meteor glass","a singing seed","a sleepy glow-moth"];
+        const found=discoveries[Math.floor(Math.random()*discoveries.length)];
+        if((pet.exploreBoosts||0)<3){const trait=["curiosity","independence","energy","calmness","sociability"][Math.floor(Math.random()*5)];const boost=2+Math.floor(Math.random()*3);adjustTrait(trait,boost);pet.exploreBoosts=(pet.exploreBoosts||0)+1;note(`${pet.name} discovered ${found} and gained ${boost} ${trait}. (${pet.exploreBoosts}/3 exploration boosts today)`);say(`Found ${found}! ${trait[0].toUpperCase()+trait.slice(1)} +${boost}`);}
+        else {note(`${pet.name} discovered ${found}, but was too tired for another personality boost today.`);say(`You found ${found}! That was quite an adventure.`);}
+      }
     };
     changes[action]?.();
     pet.actions[action]=(pet.actions[action]||0)+1;
+    pet.dirtLevel=dirtLevel;
     pet.lastSeen=Date.now();
-    say(messages[action][Math.floor(Math.random()*messages[action].length)]);
+    if(action!=="explore" || (pet.exploreBoosts||0)>=3) say(messages[action][Math.floor(Math.random()*messages[action].length)]);
     react(action);
     if (action!=="explore") note(`${pet.name} spent a little time with you: ${action}.`);
     const result=PetEvolution.updateStage(pet);
@@ -92,6 +110,7 @@
   }
   function start(name) {
     pet=PetModel.defaultPet((name||"Pip").trim().slice(0,18)||"Pip");
+    dirtLevel=0; pet.dirtLevel=0;
     PetSave.save(pet); $("welcome-dialog").close(); render(); toast(`${pet.name} has arrived!`);
   }
   document.querySelectorAll("[data-action]").forEach(btn=>btn.addEventListener("click",()=>{
@@ -107,18 +126,14 @@
     if(name && name.trim()){pet.name=name.trim().slice(0,18);note(`You chose the name ${pet.name}.`);say("I like the sound of that!");render();toast("Name updated.");}
   });
   $("export-button").addEventListener("click",()=>{PetSave.exportSave(pet);toast("Save exported.");});
-  $("sound-toggle").addEventListener("click",()=>toast("Sound effects are coming in a later update."));
-  // Update age and needs in small intervals while the page is open.
-  if (pet) {
-    const result=PetTime.advance(pet);
-    const evolution=PetEvolution.updateStage(pet);
-    if(result.hours>=1) note(`Welcome back! ${pet.name} spent ${Math.floor(result.hours)} hour${Math.floor(result.hours)===1?"":"s"} in their little world.`);
-    render();
-    if(evolution.evolved){render();toast(`${pet.name} evolved into ${evolution.form.name}!`);}
-  } else {
-    pet=PetModel.defaultPet("Pip");
-    $("welcome-dialog").showModal();
-  }
+  const titleScreen=$("title-screen"), gameScreen=$("game-screen");
+  let soundEnabled=localStorage.getItem("littleOrbit.sound")!=="off";
+  function syncSound(){const b=$("title-sound-toggle");b.textContent=soundEnabled?"♫":"♪̸";b.setAttribute("aria-label",soundEnabled?"Mute sound":"Enable sound");b.classList.toggle("sound-off",!soundEnabled);}
+  syncSound();
+  $("title-sound-toggle").addEventListener("click",e=>{e.stopPropagation();soundEnabled=!soundEnabled;localStorage.setItem("littleOrbit.sound",soundEnabled?"on":"off");syncSound();});
+  $("title-play").addEventListener("click",()=>{titleScreen.hidden=true;gameScreen.hidden=false;window.scrollTo(0,0);pet=PetSave.load();if(!pet){pet=PetModel.defaultPet("Pip");$("welcome-dialog").showModal();}else{PetTime.advance(pet);const result=PetEvolution.updateStage(pet);render();if(result.evolved)toast(`${pet.name} evolved into ${result.form.name}!`);}});
+  // Load the saved pet only when Play is pressed on the title screen.
+  pet = null;
   setInterval(()=>{
     if(!pet)return;
     const before=pet.stage;
